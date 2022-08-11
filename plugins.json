@@ -1,0 +1,22 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=ekino-tv.pl",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Minosyx/cs3-pl",
+        "fileSize": 19839,
+        "status": 3,
+        "language": "pl",
+        "authors": [
+            "Minosyx"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "EkinoProvider",
+        "description": "Ekino provider",
+        "url": "https://raw.githubusercontent.com/Minosyx/cs3-pl/builds/EkinoProvider.cs3",
+        "name": "EkinoProvider"
+    }
+]
