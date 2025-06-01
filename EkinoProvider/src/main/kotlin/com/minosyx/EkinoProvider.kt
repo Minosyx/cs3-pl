@@ -6,6 +6,7 @@ import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.MainAPI
 import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.capitalizeString
@@ -17,6 +18,8 @@ import com.lagradost.cloudstream3.newMovieLoadResponse
 import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
+import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.select.Elements
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
@@ -194,5 +197,30 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             this.year = year
             this.posterUrl = posterUrl
         }
+    }
+
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit,
+    ): Boolean {
+        val servers =
+            app
+                .get(data, interceptor = interceptor, timeout = 30)
+                .document
+                .select(".playerContainer .tab-content")
+                .first()
+
+        servers?.select(".playerContainer .tab-content div[role]")?.map { item ->
+            val id = item.id()
+            val player = id.substringAfterLast("-")
+            val code = id.substringBeforeLast("-")
+            val frameDocument = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
+            var link = frameDocument.select("a.buttonprch").attr("href")
+            // link = link.replace(Regex("""/[a-z]/"""), "/e/")
+            loadExtractor(link, subtitleCallback, callback)
+        }
+        return true
     }
 }
