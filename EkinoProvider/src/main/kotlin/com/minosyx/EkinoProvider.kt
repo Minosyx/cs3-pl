@@ -1,5 +1,6 @@
 package com.minosyx
 
+import android.util.Log
 import com.lagradost.cloudstream3.HomePageList
 import com.lagradost.cloudstream3.HomePageResponse
 import com.lagradost.cloudstream3.LoadResponse
@@ -23,7 +24,7 @@ import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.select.Elements
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
-    override var mainUrl = "https://ekino-tv.pl/"
+    override var mainUrl = "https://ekino-tv.pl"
     override var name = "Ekino"
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
@@ -217,14 +218,20 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
                 .select(".playerContainer .tab-content")
                 .first()
 
+        val tag = "MINOSYX"
+        Log.d(tag, "INCOMING DATA LINK IS: " + data)
+
         servers?.select(".playerContainer .tab-content div[role]")?.map { item ->
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
+            Log.d(player, "REQUESTED PLAYER IS: " + "$videoPrefix/$player/$code")
             val frameDocument = app.get("$videoPrefix/$player/$code", headers, data, interceptor = interceptor, timeout = 30).document
             val link = frameDocument.select("a.buttonprch").attr("href")
+            Log.d(player, "LINK TO PAGE IS: " + link)
             val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             val videoLink = videoDocument.selectFirst("iframe")?.attr("src") ?: link
+            Log.d(player, "OBTAINED IFRAM IS: " + videoLink)
             loadExtractor(videoLink, link, subtitleCallback, callback)
         }
         return true
