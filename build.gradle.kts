@@ -27,7 +27,8 @@ allprojects {
     }
 }
 
-fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) = extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
+fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) =
+    extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
 fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
 
@@ -37,12 +38,13 @@ subprojects {
     apply(plugin = "com.lagradost.cloudstream3.gradle")
 
     cloudstream {
-        // when running through github workflow, GITHUB_REPOSITORY should contain current repository name
-        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "user/repo")
+        // when running through github workflow, GITHUB_REPOSITORY should contain current repository
+        // name
+        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "Minosyx/cs3-pl")
     }
 
     android {
-        namespace = "com.example"
+        namespace = "com.minosyx"
 
         defaultConfig {
             minSdk = 21
@@ -61,7 +63,7 @@ subprojects {
                 freeCompilerArgs.addAll(
                     "-Xno-call-assertions",
                     "-Xno-param-assertions",
-                    "-Xno-receiver-assertions"
+                    "-Xno-receiver-assertions",
                 )
             }
         }
@@ -86,6 +88,4 @@ subprojects {
     }
 }
 
-task<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
-}
+task<Delete>("clean") { delete(rootProject.layout.buildDirectory) }

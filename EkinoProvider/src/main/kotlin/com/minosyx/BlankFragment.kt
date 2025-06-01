@@ -1,4 +1,4 @@
-package com.example
+package com.minosyx
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -21,8 +21,9 @@ import com.lagradost.cloudstream3.utils.UIHelper.colorFromAttribute
 /**
  * A simple [Fragment] subclass.
  */
-class BlankFragment(private val plugin: ExamplePlugin) : BottomSheetDialogFragment() {
-
+class BlankFragment(
+    private val plugin: EkinoPlugin,
+) : BottomSheetDialogFragment() {
     // Helper function to get a drawable resource by name
     @SuppressLint("DiscouragedApi")
     @Suppress("SameParameterValue")
@@ -50,7 +51,7 @@ class BlankFragment(private val plugin: ExamplePlugin) : BottomSheetDialogFragme
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         // Inflate the layout for this fragment
         val layoutId = plugin.resources?.getIdentifier("fragment_blank", "layout", BuildConfig.LIBRARY_PACKAGE_NAME)
@@ -62,7 +63,7 @@ class BlankFragment(private val plugin: ExamplePlugin) : BottomSheetDialogFragme
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onViewCreated(
         view: View,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -92,3 +93,4 @@ class BlankFragment(private val plugin: ExamplePlugin) : BottomSheetDialogFragme
         }
     }
 }
+
