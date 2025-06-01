@@ -205,6 +205,11 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit,
     ): Boolean {
+        val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        val headers =
+            mapOf(
+                "User-Agent" to userAgent,
+            )
         val servers =
             app
                 .get(data, interceptor = interceptor, timeout = 30)
@@ -217,10 +222,10 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
             val frameDocument = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
-            var link = frameDocument.select("a.buttonprch").attr("href")
-            val videoDocument = app.get("$link", interceptor = interceptor, timeout = 30).document
-            link = videoDocument.selectFirst("iframe")?.attr("src") ?: link
-            loadExtractor(link, subtitleCallback, callback)
+            val link = frameDocument.select("a.buttonprch").attr("href")
+            val videoDocument = app.get("$link", headers, mainUrl, interceptor = interceptor, timeout = 30).document
+            val videoLink = videoDocument.selectFirst("iframe")?.attr("src") ?: link
+            loadExtractor(videoLink, link, subtitleCallback, callback)
         }
         return true
     }
