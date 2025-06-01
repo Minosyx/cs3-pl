@@ -218,7 +218,8 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val code = id.substringBeforeLast("-")
             val frameDocument = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             var link = frameDocument.select("a.buttonprch").attr("href")
-            // link = link.replace(Regex("""/[a-z]/"""), "/e/")
+            val videoDocument = app.get("$link", interceptor = interceptor, timeout = 30).document
+            link = videoDocument.selectFirst("iframe")?.attr("src") ?: link
             loadExtractor(link, subtitleCallback, callback)
         }
         return true
