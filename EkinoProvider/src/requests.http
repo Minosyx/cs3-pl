@@ -1,3 +1,16 @@
-GET https://www.ekino-tv.pl
+GET https://ekino-tv.pl/watch/f/player/7oKK0khkllRUS-I8EwLGN0-o6yAHM__t0a3DsA HTTP/2
+Host: ekino-tv.pl
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0
-accept: text/html
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br, zstd
+DNT: 1
+Sec-GPC: 1
+Connection: keep-alive
+Referer: https://ekino-tv.pl/movie/show/oszukac-przeznaczenie-wiezy-krwi-ai-final-destination-bloodlines-2025-lektor-ai/38718
+Cookie: cf_clearance=mISOPvFzaU237hqplEmexdr4g3T3AzZfrMxHOQ_3Bwk-1748810087-1.2.1.1-80QOu7zcd9qdYwLYW91amrlzygdheSgiap5kUARd0cQwlFgY3em_KyTJIiOUQp0DuazHJl7DYypdRJHPzhL1M0S2rZ2sDwgcm8UAr4P45v3sMKfTzwggH1sdZ3.FyIV4HLWE9vrobWTomiqc8X0JuSu1OhTv0stazQbJSTFvdQe794gLcaZ5T6zBH2nzMWUNxZt4etpIAPO.KbNXE8LCQBFqZtIu4vdOSVzEQNE9R_fD0OnrtMLv8Ro9bBnGaaJuAmsfheipRzk4.MXG4ANLtBbyy0U24Jip9GCvyqjqb2.Ge1juvp1hBJ9nDgYzHI8G4eelwEe_0_27PQC5gUeIJLuc4.LzUUJTipxaZfkzIeM; PHPSESSID=73iabr78ogn1e3dndafod0ir47; _ga_27W1NV5P6C=GS2.1.s1748810089$o1$g0$t1748810089$j60$l0$h0; _ga=GA1.2.2081695666.1748810090; _gid=GA1.2.851616352.1748810090
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: iframe
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Priority: u=4

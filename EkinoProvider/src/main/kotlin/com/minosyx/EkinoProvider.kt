@@ -23,7 +23,7 @@ import com.lagradost.cloudstream3.utils.loadExtractor
 import org.jsoup.select.Elements
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
-    override var mainUrl = "https://www.ekino-tv.pl/"
+    override var mainUrl = "https://ekino-tv.pl/"
     override var name = "Ekino"
     override val supportedTypes = setOf(TvType.Movie, TvType.TvSeries)
 
@@ -205,7 +205,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
         subtitleCallback: (SubtitleFile) -> Unit,
         callback: (ExtractorLink) -> Unit,
     ): Boolean {
-        val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        val userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0"
         val headers =
             mapOf(
                 "User-Agent" to userAgent,
@@ -221,9 +221,9 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
-            val frameDocument = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
+            val frameDocument = app.get("$videoPrefix/$player/$code", headers, data, interceptor = interceptor, timeout = 30).document
             val link = frameDocument.select("a.buttonprch").attr("href")
-            val videoDocument = app.get("$link", headers, mainUrl, interceptor = interceptor, timeout = 30).document
+            val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             val videoLink = videoDocument.selectFirst("iframe")?.attr("src") ?: link
             loadExtractor(videoLink, link, subtitleCallback, callback)
         }
