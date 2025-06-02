@@ -9,7 +9,6 @@ import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
-import com.lagradost.cloudstream3.apmap
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.capitalizeString
 import com.lagradost.cloudstream3.capitalizeStringNullable
@@ -23,6 +22,7 @@ import com.lagradost.cloudstream3.newTvSeriesSearchResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.newExtractorLink
+import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
@@ -41,7 +41,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
     override suspend fun search(query: String): List<SearchResponse> {
         val url = "$mainUrl/search/qf/?q=$query"
         val document = app.get(url, interceptor = interceptor, timeout = 30).document
-        val lists = document.select(".movie-wrap > :not(div.menu-wrap")
+        val lists = document.select(".movie-wrap > :not(div.menu-wrap)")
         val movies = lists[0].select(".movies-list-item")
         val series = lists[1].select(".movies-list-item")
 
@@ -49,7 +49,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
         return getVideos(TvType.Movie, movies) + getVideos(TvType.TvSeries, series)
     }
 
-    fun getVideos(
+    private fun getVideos(
         type: TvType,
         items: Elements,
     ): List<SearchResponse> {
@@ -213,17 +213,19 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             mapOf(
                 "User-Agent" to userAgent,
             )
-        val servers =
-            app
-                .get(data, interceptor = interceptor, timeout = 30)
-                .document
-                .select(".playerContainer .tab-content")
-                .first()
+        val document =
+            if (data.startsWith("http")) {
+                app
+                    .get(data, interceptor = interceptor, timeout = 30)
+                    .document
+            } else {
+                Jsoup.parse(data)
+            }
 
         val tag = "MINOSYX"
         Log.d(tag, "INCOMING DATA LINK IS: " + data)
 
-        servers?.select(".playerContainer .tab-content div[role]")?.apmap { item ->
+        document.select(".playerContainer .tab-content div[role]").map { item ->
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
@@ -232,7 +234,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val link = frameDocument.select("a.buttonprch").attr("href")
             Log.d(player, "LINK TO PAGE IS: " + link)
             val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
-            val videoLink = videoDocument.selectFirst("iframe")?.attr("src") ?: link
+            val videoLink = videoDocument.selectFirst("iframe[src]")?.attr("src") ?: link
             Log.d(player, "OBTAINED IFRAM IS: " + videoLink)
             callback.invoke(
                 newExtractorLink(player, player, videoLink, ExtractorLinkType.M3U8) {
