@@ -243,7 +243,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             if (unpacker.detect()) {
                 val unpacked = unpacker.unpack()
                 Log.d(player, "UNPACKED: " + unpacked)
-                val p = Pattern.compile("file:\"(http[^\"]+")
+                val p = Pattern.compile("file:\"(http[^\"]+)")
                 val m = p.matcher(unpacked ?: "")
                 if (m.find() && m.groupCount() > 0) {
                     stream = m.group(1) ?: ""
