@@ -21,9 +21,11 @@ import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import com.lagradost.cloudstream3.utils.JsUnpacker
 import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
+import java.util.regex.Pattern
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
     override var mainUrl = "https://ekino-tv.pl"
@@ -227,12 +229,28 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val frameDocument = app.get("$videoPrefix/$player/$code", headers, mainUrl, interceptor = interceptor, timeout = 30).document
             val link = frameDocument.select("a.buttonprch").attr("href")
             Log.d(player, "LINK TO PAGE IS: " + link)
-            val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
+            val videoDocument = app.get(link, headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             val videoLink = videoDocument.selectFirst("iframe[src]")?.attr("src") ?: link
             Log.d(player, "OBTAINED IFRAME IS: " + videoLink)
+            val secondIFrame = app.get(videoLink, headers, link, interceptor = interceptor, timeout = 30).document
+            val innerVideoLink = secondIFrame.selectFirst("iframe[src]")?.attr("src") ?: videoLink
+            val pageWithPacked = app.get(innerVideoLink, headers, videoLink, interceptor = interceptor, timeout = 30).document
+            val packed = pageWithPacked.select("script").last()?.text()
+            val unpacker = JsUnpacker(packed)
+            var stream = ""
+            if (unpacker.detect()) {
+                val unpacked = unpacker.unpack()
+                Log.d(player, "UNPACKED: " + unpacked)
+                val p = Pattern.compile("file:\"(http[^\"]+")
+                val m = p.matcher(unpacked ?: "")
+                if (m.find() && m.groupCount() > 0) {
+                    stream = m.group(1) ?: ""
+                }
+            }
+            Log.d(player, "STREAM: " + stream)
             callback.invoke(
-                newExtractorLink(player, player, videoLink, ExtractorLinkType.M3U8) {
-                    this.referer = "$videoPrefix/$player/$code"
+                newExtractorLink(player, player, stream, ExtractorLinkType.M3U8) {
+                    this.referer = mainUrl
                 },
             )
         }
