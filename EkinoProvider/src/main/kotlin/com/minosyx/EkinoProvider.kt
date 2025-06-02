@@ -234,8 +234,10 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             Log.d(player, "OBTAINED IFRAME IS: " + videoLink)
             val secondIFrame = app.get(videoLink, headers, link, interceptor = interceptor, timeout = 30).document
             val innerVideoLink = secondIFrame.selectFirst("iframe[src]")?.attr("src") ?: videoLink
+            Log.d(player, "OBTAINED INNER IFRAME IS: " + innerVideoLink)
             val pageWithPacked = app.get(innerVideoLink, headers, videoLink, interceptor = interceptor, timeout = 30).document
-            val packed = pageWithPacked.select("script").last()?.text()
+            val packed = pageWithPacked.select("script").last()?.html()
+            Log.d("player", "PACKED: $packed")
             val unpacker = JsUnpacker(packed)
             var stream = ""
             if (unpacker.detect()) {
