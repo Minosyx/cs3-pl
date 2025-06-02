@@ -9,6 +9,7 @@ import com.lagradost.cloudstream3.MainPageRequest
 import com.lagradost.cloudstream3.SearchResponse
 import com.lagradost.cloudstream3.SubtitleFile
 import com.lagradost.cloudstream3.TvType
+import com.lagradost.cloudstream3.apmap
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.capitalizeString
 import com.lagradost.cloudstream3.capitalizeStringNullable
@@ -20,7 +21,8 @@ import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.newTvSeriesSearchResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
-import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
+import com.lagradost.cloudstream3.utils.newExtractorLink
 import org.jsoup.select.Elements
 
 class EkinoProvider : MainAPI() { // All providers must be an instance of MainAPI
@@ -221,7 +223,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
         val tag = "MINOSYX"
         Log.d(tag, "INCOMING DATA LINK IS: " + data)
 
-        servers?.select(".playerContainer .tab-content div[role]")?.map { item ->
+        servers?.select(".playerContainer .tab-content div[role]")?.apmap { item ->
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
@@ -232,7 +234,11 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             val videoLink = videoDocument.selectFirst("iframe")?.attr("src") ?: link
             Log.d(player, "OBTAINED IFRAM IS: " + videoLink)
-            loadExtractor(videoLink, link, subtitleCallback, callback)
+            callback.invoke(
+                newExtractorLink(player, player, videoLink, ExtractorLinkType.M3U8) {
+                    this.referer = "$videoPrefix/$player/$code"
+                },
+            )
         }
         return true
     }
