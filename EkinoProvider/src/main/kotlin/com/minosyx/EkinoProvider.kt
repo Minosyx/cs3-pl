@@ -214,13 +214,7 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
                 "User-Agent" to userAgent,
             )
         val document =
-            if (data.startsWith("http")) {
-                app
-                    .get(data, interceptor = interceptor, timeout = 30)
-                    .document
-            } else {
-                Jsoup.parse(data)
-            }
+            Jsoup.parse(data)
 
         val tag = "MINOSYX"
         Log.d(tag, "INCOMING DATA LINK IS: " + data)
@@ -230,12 +224,12 @@ class EkinoProvider : MainAPI() { // All providers must be an instance of MainAP
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
             Log.d(player, "REQUESTED PLAYER IS: " + "$videoPrefix/$player/$code")
-            val frameDocument = app.get("$videoPrefix/$player/$code", headers, data, interceptor = interceptor, timeout = 30).document
+            val frameDocument = app.get("$videoPrefix/$player/$code", headers, mainUrl, interceptor = interceptor, timeout = 30).document
             val link = frameDocument.select("a.buttonprch").attr("href")
             Log.d(player, "LINK TO PAGE IS: " + link)
             val videoDocument = app.get("$link", headers, "$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             val videoLink = videoDocument.selectFirst("iframe[src]")?.attr("src") ?: link
-            Log.d(player, "OBTAINED IFRAM IS: " + videoLink)
+            Log.d(player, "OBTAINED IFRAME IS: " + videoLink)
             callback.invoke(
                 newExtractorLink(player, player, videoLink, ExtractorLinkType.M3U8) {
                     this.referer = "$videoPrefix/$player/$code"
